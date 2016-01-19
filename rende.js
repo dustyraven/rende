@@ -89,16 +89,20 @@
 		,render : function(str)
 		{
 			//var startOfs = wsFront(lines[0]);
-			var $this = this;
-			var lines = str.split("\n").filter(function(val){return val.trim();});
-			var i, e, indent, row, stack = [], elements = [], args = Array.prototype.slice.call(arguments,1);
+			var $this = this,
+				lines = str.split("\n").filter(function(val){return val.trim();}),
+				args = Array.prototype.slice.call(arguments,1),
+				i, e, indent, row, stack = [], elements = [];
 
 			stack[0] = "0 - div;";		 // just for debugging -> must be 0;
 			elements[0] = $this.el("rendered;");
 			for(row = 0; row < lines.length; row++)
 			{
-				indent = 1 + $this.wsFront(lines[row]);
 				e = lines[row].trim();
+				if(0 === e.indexOf("//"))
+					continue;
+
+				indent = 1 + $this.wsFront(lines[row]);
 
 				elements[row+1] = $this.el.apply( $this, [e].concat(args) );
 
