@@ -5,6 +5,7 @@
 
 	var Rende = {
 
+
 		/**
 		 *
 		 */
@@ -40,7 +41,7 @@
 			str = str.replace("|;","__ESC_SC__").replace("|:","__ESC_CN__").replace("|=","__ESC_EQ__");
 
 			if(-1 == str.indexOf(";"))
-				return document.createTextNode(str);
+				return document.createTextNode(" " + str + " ");
 
 			str = str.split(";");
 
@@ -90,17 +91,16 @@
 			//var startOfs = wsFront(lines[0]);
 			var $this = this;
 			var lines = str.split("\n").filter(function(val){return val.trim();});
-			var i, e, indent, row, stack = [], elements = [];
+			var i, e, indent, row, stack = [], elements = [], args = Array.prototype.slice.call(arguments,1);
 
 			stack[0] = "0 - div;";		 // just for debugging -> must be 0;
 			elements[0] = $this.el("rendered;");
-
 			for(row = 0; row < lines.length; row++)
 			{
 				indent = 1 + $this.wsFront(lines[row]);
 				e = lines[row].trim();
 
-				elements[row+1] = $this.el(e);
+				elements[row+1] = $this.el.apply( $this, [e].concat(args) );
 
 				stack.splice(indent);
 				while(stack.length > 0 && undefined === stack[stack.length-1])
@@ -119,7 +119,7 @@
 		 */
 		,rend : function(arg)
 		{
-			var $this = this;
+			var $this = this, comments;
 
 			if(!arg)
 				arg = $("rende");
@@ -132,6 +132,13 @@
 
 				if(!str.trim())
 					str = _this.contents().filter(function(){return this.nodeType === 8;}).get(0).nodeValue;
+
+				/*
+					comments = _this.contents().filter(function(){return this.nodeType === 8;}).get();
+					$.each(comments, function(idx, comment){
+						console.log(comment.nodeValue);
+					});
+				*/
 
 				if(str.trim())
 				{
@@ -147,7 +154,7 @@
 
 
 	$.fn.rende = function() {
-		return $(Rende.render(arguments[0]));
+		return $(Rende.render.apply(Rende, arguments));
 	}
 
 	Rende.rend();
